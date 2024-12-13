@@ -222,6 +222,7 @@ class Platform extends GameObjects {
 
 class enemy extends GameObjects {
   damage: number;
+  health: number;
 
   constructor(
     color: string,
@@ -232,6 +233,7 @@ class enemy extends GameObjects {
   ) {
     super(color, posX, posY, height, width);
     this.damage = 10;
+    this.health = 100;
   }
 
   draw() {

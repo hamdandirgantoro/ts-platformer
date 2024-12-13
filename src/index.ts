@@ -1,4 +1,4 @@
-import { Input } from "./core/input";
+import { input } from "./core/input";
 import { canvas, ctx } from "./core/canvas";
 import { gameObjects } from "./core/game-objects";
 import { gameUI } from "./core/game-ui";
@@ -8,7 +8,6 @@ let velocity: number = 0;
 let time_step: number = 0.016;
 let isJumping: boolean = false;
 let jumpEnergy: number = -1200;
-let input = new Input();
 
 const loop = () => {
   ctx.fillStyle = "black";
@@ -44,13 +43,24 @@ const loop = () => {
   gameObjects.weapon.bullets.forEach((bullet, index) => {
     bullet.update();
     bullet.draw();
+    if (
+      bullet.posX >= gameObjects.enemy.posX - 10 &&
+      bullet.posX <= gameObjects.enemy.posX + gameObjects.enemy.width + 10 &&
+      bullet.posY >= gameObjects.enemy.posY - 10 &&
+      bullet.posY <= gameObjects.enemy.posY + gameObjects.enemy.height + 10
+    ) {
+      gameObjects.enemy.health -= gameObjects.weapon.damage;
+      gameObjects.weapon.bullets.splice(index, 1);
+    }
     if (bullet.isOffScreen()) {
       gameObjects.weapon.bullets.splice(index, 1);
     }
   });
   let clientMouse = input.getClientMouseProp();
   gameObjects.weapon.update(clientMouse.mouseX, clientMouse.mouseY);
-  gameUI.healthBar.attachTo(gameObjects.player);
+  gameUI.healthBar.attachTo(gameObjects.player, 0);
+  gameUI.healthBar.draw();
+  gameUI.healthBar.attachTo(gameObjects.enemy, 1, true);
   gameUI.healthBar.draw();
   requestAnimationFrame(loop);
 };

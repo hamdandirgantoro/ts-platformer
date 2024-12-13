@@ -27,7 +27,7 @@ type keyParams =
   | "ArrowDown"
   | "ArrowUp";
 
-export class Input {
+class Input {
   private keys: keys;
   private clientMouse: clientMouse;
 
@@ -92,3 +92,5 @@ export class Input {
     return this.clientMouse;
   }
 }
+let input = new Input();
+export { input };

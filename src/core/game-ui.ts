@@ -1,5 +1,4 @@
 import { canvas, ctx } from "./canvas";
-import { gameObjects } from "./game-objects";
 
 class HealthBar {
   private color: string;
@@ -8,6 +7,13 @@ class HealthBar {
   private height: number;
   private width: number;
   private objectHealth: number;
+  private gameObjects: Array<{
+    id: number;
+    health: number;
+    posX: number;
+    posY: number;
+    followObject: boolean;
+  }>;
 
   constructor(
     color: string,
@@ -22,23 +28,62 @@ class HealthBar {
     this.height = height;
     this.width = width;
     this.objectHealth = 0;
+    this.gameObjects = [];
   }
 
-  public attachTo(gameObject: { health: number }): void {
+  public attachTo(
+    gameObject: { health: number; posX: number; posY: number },
+    id: number,
+    followObject: boolean = false
+  ): void {
     this.objectHealth = gameObject.health;
+    const objectExistInArray = this.gameObjects.find((item) => item.id == id);
+    if (objectExistInArray) {
+      // objectExistInArray.followObject = followObject;
+      objectExistInArray.health = gameObject.health;
+      objectExistInArray.posX = gameObject.posX;
+      objectExistInArray.posY = gameObject.posY;
+      return;
+    }
+    this.gameObjects.push({ ...gameObject, id, followObject });
   }
 
   public draw(): void {
-    ctx.fillStyle = "blue";
-    ctx.fillRect(this.posX, this.posY, this.width, this.height);
-    ctx.fillStyle = this.color;
-    // const ObjectHealth: number = (this.objectHealth / 100) * 100;
-    if (this.objectHealth! >= 0) {
-      ctx.fillRect(this.posX, this.posY, this.objectHealth * 2, this.height);
-    }
+    this.gameObjects.forEach((gameObject) => {
+      if (gameObject.followObject) {
+        let posX = gameObject.posX - 50;
+        let posY = gameObject.posY - 50;
+        ctx.fillStyle = "blue";
+        ctx.fillRect(posX, posY, this.width, this.height);
+        ctx.fillStyle = this.color;
+        if (gameObject.health! >= 0) {
+          ctx.fillRect(posX, posY, gameObject.health * 2, this.height);
+        }
+      } else {
+        ctx.fillStyle = "blue";
+        ctx.fillRect(this.posX, this.posY, this.width, this.height);
+        ctx.fillStyle = this.color;
+        if (gameObject.health! >= 0) {
+          ctx.fillRect(
+            this.posX,
+            this.posY,
+            gameObject.health * 2,
+            this.height
+          );
+        }
+      }
+    });
   }
 
-  public folowObject(): void {}
+  // public folowObject(gameObject: {
+  //   posX: number;
+  //   posY: number;
+  //   height: number;
+  //   width: number;
+  // }): void {
+  //   this.posX = gameObject.posX - 50;
+  //   this.posY = gameObject.posY - 50;
+  // }
 }
 
 let gameUIRegister = { healthBar: new HealthBar("white", 5, 5, 20, 200) };

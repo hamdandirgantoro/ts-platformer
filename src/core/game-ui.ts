@@ -75,6 +75,11 @@ class HealthBar {
     });
   }
 
+  public detachFromObject(id: number): void {
+    const index = this.gameObjects.findIndex((item) => item.id == id);
+    this.gameObjects.splice(index, 1);
+  }
+
   // public folowObject(gameObject: {
   //   posX: number;
   //   posY: number;

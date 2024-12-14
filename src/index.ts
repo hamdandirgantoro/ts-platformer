@@ -2,6 +2,7 @@ import { input } from "./core/input";
 import { canvas, ctx } from "./core/canvas";
 import { gameObjects } from "./core/game-objects";
 import { gameUI } from "./core/game-ui";
+import { basicEnemyAI } from "./ai/basicEnemyAI";
 
 const gravity = 2800;
 let velocity: number = 0;
@@ -9,11 +10,12 @@ let time_step: number = 0.016;
 let isJumping: boolean = false;
 let jumpEnergy: number = -1200;
 
+gameObjects.enemy.ai = basicEnemyAI;
+
 const loop = () => {
   ctx.fillStyle = "black";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   gameObjects.player.draw();
-  gameObjects.enemy.draw();
   gameObjects.weapon.draw();
   if (!gameObjects.player.onGround(gameObjects.platform) && !isJumping) {
     velocity += gravity * time_step;
@@ -49,8 +51,10 @@ const loop = () => {
       bullet.posY >= gameObjects.enemy.posY - 10 &&
       bullet.posY <= gameObjects.enemy.posY + gameObjects.enemy.height + 10
     ) {
-      gameObjects.enemy.health -= gameObjects.weapon.damage;
-      gameObjects.weapon.bullets.splice(index, 1);
+      if (gameObjects.enemy.health > 0) {
+        gameObjects.enemy.health -= gameObjects.weapon.damage;
+        gameObjects.weapon.bullets.splice(index, 1);
+      }
     }
     if (bullet.isOffScreen()) {
       gameObjects.weapon.bullets.splice(index, 1);
@@ -60,8 +64,13 @@ const loop = () => {
   gameObjects.weapon.update(clientMouse.mouseX, clientMouse.mouseY);
   gameUI.healthBar.attachTo(gameObjects.player, 0);
   gameUI.healthBar.draw();
-  gameUI.healthBar.attachTo(gameObjects.enemy, 1, true);
-  gameUI.healthBar.draw();
+  if (gameObjects.enemy.health > 0) {
+    gameObjects.enemy.draw();
+    gameUI.healthBar.attachTo(gameObjects.enemy, 1, true);
+    gameUI.healthBar.draw();
+  } else {
+    gameUI.healthBar.detachFromObject(1);
+  }
   requestAnimationFrame(loop);
 };
 requestAnimationFrame(loop);

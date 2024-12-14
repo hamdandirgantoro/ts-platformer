@@ -223,6 +223,7 @@ class Platform extends GameObjects {
 class enemy extends GameObjects {
   damage: number;
   health: number;
+  ai: CallableFunction;
 
   constructor(
     color: string,
@@ -234,11 +235,13 @@ class enemy extends GameObjects {
     super(color, posX, posY, height, width);
     this.damage = 10;
     this.health = 100;
+    this.ai = () => {};
   }
 
   draw() {
     ctx.fillStyle = this.color;
     ctx.fillRect(this.posX, this.posY, this.width, this.height);
+    this.ai(this);
   }
 }
 
@@ -265,4 +268,4 @@ let gameObjectsRegister = {
   enemy: new enemy("blue", playerPosX + 400, platformPosY - 100, 100, 100),
 };
 
-export { gameObjectsRegister as gameObjects };
+export { gameObjectsRegister as gameObjects, enemy };
